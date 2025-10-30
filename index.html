@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kismet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'cool-blue': {
+                '50': '#f0f9ff',
+                '100': '#e0f2fe',
+                '200': '#bae6fd',
+                '300': '#7dd3fc',
+                '400': '#38bdf8',
+                '500': '#0ea5e9',
+                '600': '#0284c7',
+                '700': '#0369a1',
+                '800': '#075985',
+                '900': '#0c4a6e',
+                '950': '#082f49',
+              },
+              'slate': {
+                '50': '#f8fafc',
+                '100': '#f1f5f9',
+                '200': '#e2e8f0',
+                '300': '#cbd5e1',
+                '400': '#94a3b8',
+                '500': '#64748b',
+                '600': '#475569',
+                '700': '#334155',
+                '800': '#1e293b',
+                '900': '#0f172a',
+                '950': '#020617',
+              },
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Enhanced styles for responsive tables */
+      :root {
+        --rt-bg-color: #1e293b; /* slate-800 */
+        --rt-border-color: #334155; /* slate-700 */
+        --rt-label-color: #94a3b8; /* slate-400 */
+      }
+      @media screen and (max-width: 768px) {
+        .responsive-table thead {
+          display: none;
+        }
+        .responsive-table tr {
+          display: block;
+          margin-bottom: 1.5rem;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          border: 1px solid var(--rt-border-color);
+          background-color: var(--rt-bg-color);
+        }
+        .responsive-table td {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 1.25rem;
+          text-align: right;
+          border-bottom: 1px solid var(--rt-border-color);
+        }
+        .responsive-table td:last-child {
+            border-bottom: none;
+        }
+        .responsive-table td::before {
+          content: attr(data-label);
+          font-weight: 600; /* semibold */
+          color: var(--rt-label-color);
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+          text-align: left;
+          margin-right: 1rem;
+        }
+      }
+
+      /* Print-specific styles */
+      @media print {
+        body {
+          background-color: white !important;
+          color: black !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+        main {
+          padding: 0 !important;
+        }
+        .printable-area {
+          box-shadow: none !important;
+          border: 1px solid #ccc;
+        }
+        .printable-area, .printable-area * {
+            background-color: white !important;
+            color: black !important;
+            border-color: #ccc !important;
+        }
+        .printable-area a {
+            text-decoration: none;
+        }
+        .printable-area .text-cool-blue-400 {
+            color: #38bdf8 !important;
+        }
+         .printable-area .text-green-300 {
+            color: #34d399 !important;
+        }
+         .printable-area .text-red-400 {
+            color: #f87171 !important;
+        }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.77.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-slate-900">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
