@@ -171,7 +171,7 @@ const SettingsPage: React.FC = () => {
 
     const handleCopyLink = () => {
         if (settings.slug) {
-            const url = `${window.location.origin}${window.location.pathname}#/public/t/${settings.slug}`;
+            const url = `https://kismetdev.netlify.app/#/public/t/${settings.slug}`;
             navigator.clipboard.writeText(url);
             setCopySuccess(true);
             setTimeout(() => setCopySuccess(false), 2000);
@@ -400,7 +400,7 @@ const SettingsPage: React.FC = () => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    value={`${window.location.origin}${window.location.pathname}#/public/t/${settings.slug || ''}`}
+                                    value={`https://kismetdev.netlify.app/#/public/t/${settings.slug || ''}`}
                                     className="w-full p-2 bg-slate-900 rounded-md text-gray-400 cursor-copy"
                                     onClick={handleCopyLink}
                                 />
