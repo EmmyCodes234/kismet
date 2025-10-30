@@ -60,7 +60,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, tournament, 
     };
 
     return (
-        <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+        <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm md:text-base">
                     <thead className="bg-slate-900/50 text-xs md:text-sm text-gray-300 uppercase tracking-wider sticky top-0">
@@ -141,31 +141,140 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, tournament, 
     );
 };
 
+interface MobileStandingsCardProps {
+    standing: Standing;
+    tournament: Tournament;
+    isPublic: boolean;
+    slug?: string;
+    tournamentId?: string;
+}
+
+const MobileStandingsCard: React.FC<MobileStandingsCardProps> = ({ standing, tournament, isPublic, slug, tournamentId }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    return (
+        <div 
+            className="md:hidden bg-slate-800 rounded-xl shadow-lg border border-slate-700 mb-4 overflow-hidden"
+            onClick={() => setIsExpanded(!isExpanded)}
+        >
+            {/* Compact View (Always Visible) */}
+            <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center">
+                    <div className="font-bold text-xl text-cool-blue-400 w-8">#{standing.rank}</div>
+                    <div className="ml-3">
+                        <Link 
+                            to={isPublic && slug 
+                                ? `/public/t/${slug}/player/${standing.player.id}`
+                                : `/tournament/${tournamentId}/player/${standing.player.id}`} 
+                            className="font-medium hover:text-cool-blue-400 hover:underline block"
+                        >
+                            {standing.player.name}
+                        </Link>
+                        <div className="text-xs text-gray-400 mt-1">
+                            #{standing.player.seed} • {standing.wins}-{standing.losses}
+                        </div>
+                    </div>
+                </div>
+                <div className="flex items-center">
+                    <span className={`px-2 py-1 rounded text-sm font-mono ${standing.cumulativeSpread > 0 ? 'bg-green-900/30 text-green-400' : standing.cumulativeSpread < 0 ? 'bg-red-900/30 text-red-400' : 'bg-slate-700'}`}>
+                        {standing.cumulativeSpread > 0 ? `+${standing.cumulativeSpread}` : standing.cumulativeSpread}
+                    </span>
+                    <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        className={`h-5 w-5 text-gray-400 ml-2 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+
+            {/* Expanded View (Hidden by default) */}
+            {isExpanded && (
+                <div className="px-4 pb-4 border-t border-slate-700 pt-3">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <div className="text-xs text-gray-400">Last Game</div>
+                            <div className="font-mono text-sm">{formatLastGame(standing.lastGame)}</div>
+                        </div>
+                        <div>
+                            <div className="text-xs text-gray-400">Buchholz</div>
+                            <div className="font-mono">{standing.buchholz}</div>
+                        </div>
+                        <div>
+                            <div className="text-xs text-gray-400">Rating</div>
+                            <div>{standing.player.rating}</div>
+                        </div>
+                        <div>
+                            <div className="text-xs text-gray-400">Median Buchholz</div>
+                            <div className="font-mono">{standing.medianBuchholz}</div>
+                        </div>
+                    </div>
+                    {standing.clinchStatus === 'clinched' && (
+                        <div className="mt-3 flex items-center text-green-400 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Clinched
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const StandingsSkeleton: React.FC = () => (
-    <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
-        <div className="overflow-x-auto">
-            <table className="w-full text-sm md:text-base">
-                <thead className="bg-slate-900/50 text-xs md:text-sm text-gray-300 uppercase tracking-wider">
-                    <tr>
-                        <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-16" /></th>
-                        <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-32" /></th>
-                        <th className="p-3 md:p-4 text-center"><SkeletonLoader className="h-5 w-16" /></th>
-                        <th className="p-3 md:p-4 text-right"><SkeletonLoader className="h-5 w-16" /></th>
-                        <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-24" /></th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <tr key={i} className="hover:bg-slate-700/30">
-                            <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-8" /></td>
-                            <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-40" /></td>
-                            <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-16 mx-auto" /></td>
-                            <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-16 ml-auto" /></td>
-                            <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-24" /></td>
+    <div>
+        {/* Desktop Skeleton */}
+        <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm md:text-base">
+                    <thead className="bg-slate-900/50 text-xs md:text-sm text-gray-300 uppercase tracking-wider">
+                        <tr>
+                            <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-16" /></th>
+                            <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-32" /></th>
+                            <th className="p-3 md:p-4 text-center"><SkeletonLoader className="h-5 w-16" /></th>
+                            <th className="p-3 md:p-4 text-right"><SkeletonLoader className="h-5 w-16" /></th>
+                            <th className="p-3 md:p-4 text-left"><SkeletonLoader className="h-5 w-24" /></th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <tr key={i} className="hover:bg-slate-700/30">
+                                <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-8" /></td>
+                                <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-40" /></td>
+                                <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-16 mx-auto" /></td>
+                                <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-16 ml-auto" /></td>
+                                <td className="p-3 md:p-4"><SkeletonLoader className="h-6 w-24" /></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {/* Mobile Skeleton */}
+        <div className="md:hidden space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-slate-800 rounded-xl shadow-lg border border-slate-700 p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <SkeletonLoader className="h-6 w-8 rounded" />
+                            <div className="ml-3">
+                                <SkeletonLoader className="h-4 w-24" />
+                                <SkeletonLoader className="h-3 w-16 mt-1" />
+                            </div>
+                        </div>
+                        <div className="flex items-center">
+                            <SkeletonLoader className="h-6 w-12 rounded" />
+                            <SkeletonLoader className="h-5 w-5 ml-2 rounded-full" />
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
     </div>
 );
@@ -344,13 +453,35 @@ const StandingsPage: React.FC<{isPublic?: boolean}> = ({ isPublic = false }) => 
                 )}
 
                 {activeTab === 'individual' ? (
-                    <StandingsTable 
-                        standings={filteredIndividualStandings} 
-                        tournament={tournament!} 
-                        isPublic={isPublic} 
-                        slug={slug} 
-                        tournamentId={tournamentId} 
-                    />
+                    <div>
+                        {/* Mobile Cards */}
+                        <div className="md:hidden">
+                            {filteredIndividualStandings.map((standing) => (
+                                <MobileStandingsCard 
+                                    key={standing.player.id}
+                                    standing={standing}
+                                    tournament={tournament!}
+                                    isPublic={isPublic}
+                                    slug={slug}
+                                    tournamentId={tournamentId}
+                                />
+                            ))}
+                            {filteredIndividualStandings.length === 0 && (
+                                <div className="p-8 text-center text-gray-400 bg-slate-800 rounded-xl border border-slate-700">
+                                    Standings will be available once the first round is completed.
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Desktop Table */}
+                        <StandingsTable 
+                            standings={filteredIndividualStandings} 
+                            tournament={tournament!} 
+                            isPublic={isPublic} 
+                            slug={slug} 
+                            tournamentId={tournamentId} 
+                        />
+                    </div>
                 ) : ( // Team Standings
                     <div className="space-y-4">
                         {allTeamStandings.map(ts => (

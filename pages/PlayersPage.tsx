@@ -20,7 +20,8 @@ const PlayersSkeleton: React.FC = () => (
             <SkeletonLoader className="h-10 w-32" />
         </div>
         
-        <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+        {/* Desktop Skeleton */}
+        <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead className="bg-slate-900/50 text-xs text-gray-300 uppercase tracking-wider">
@@ -44,8 +45,132 @@ const PlayersSkeleton: React.FC = () => (
                 </table>
             </div>
         </div>
+        
+        {/* Mobile Skeleton */}
+        <div className="md:hidden space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-slate-800 rounded-xl shadow-lg border border-slate-700 p-4">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <SkeletonLoader className="h-5 w-32 mb-1" />
+                            <SkeletonLoader className="h-4 w-24" />
+                        </div>
+                        <SkeletonLoader className="h-6 w-16 rounded-full" />
+                    </div>
+                    <div className="flex justify-between mt-3">
+                        <div>
+                            <SkeletonLoader className="h-3 w-16 mb-1" />
+                            <SkeletonLoader className="h-4 w-12" />
+                        </div>
+                        <div>
+                            <SkeletonLoader className="h-3 w-16 mb-1" />
+                            <SkeletonLoader className="h-4 w-12" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
 );
+
+interface MobilePlayerCardProps {
+    player: Player;
+    tournament?: Tournament | null;
+    teams: Team[];
+    getClassName: (clsId: number | null, classes: Class[]) => string;
+    getTeamName: (teamId: number | null) => string | undefined;
+    isPublic: boolean;
+    slug?: string;
+    tournamentId?: string;
+}
+
+const MobilePlayerCard: React.FC<MobilePlayerCardProps> = ({ 
+    player, 
+    tournament, 
+    teams, 
+    getClassName, 
+    getTeamName, 
+    isPublic, 
+    slug, 
+    tournamentId 
+}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const division = tournament?.divisions.find(d => d.id === player.divisionId);
+    const teamName = getTeamName(player.teamId);
+
+    return (
+        <div 
+            className="md:hidden bg-slate-800 rounded-xl shadow-lg border border-slate-700 mb-4"
+            onClick={() => setIsExpanded(!isExpanded)}
+        >
+            {/* Compact View (Always Visible) */}
+            <div className="p-4">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <Link 
+                            to={isPublic && slug 
+                                ? `/public/t/${slug}/player/${player.id}` 
+                                : `/tournament/${tournamentId}/player/${player.id}`}
+                            className="font-medium hover:text-cool-blue-400 hover:underline block"
+                        >
+                            {player.name}
+                        </Link>
+                        {tournament?.teamSettings.displayTeamNames && teamName && (
+                            <div className="text-xs text-gray-400 mt-1">{teamName}</div>
+                        )}
+                    </div>
+                    <div className="flex items-center">
+                        <span className={`px-2 py-1 text-xs font-bold rounded-full capitalize ${
+                            player.status === 'active' 
+                                ? 'bg-green-900/30 text-green-400' 
+                                : 'bg-slate-700 text-gray-400'
+                        }`}>
+                            {player.status}
+                        </span>
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className={`h-5 w-5 text-gray-400 ml-2 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <div className="flex justify-between mt-3">
+                    <div>
+                        <div className="text-xs text-gray-400">Rating</div>
+                        <div className="font-medium">{player.rating}</div>
+                    </div>
+                    <div>
+                        <div className="text-xs text-gray-400">Seed</div>
+                        <div className="font-medium">#{player.seed}</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Expanded View (Hidden by default) */}
+            {isExpanded && (
+                <div className="px-4 pb-4 border-t border-slate-700 pt-3">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <div className="text-xs text-gray-400">Division</div>
+                            <div>{division?.name || 'N/A'}</div>
+                        </div>
+                        {tournament?.divisionMode === 'single' && tournament.classes.length > 0 && (
+                            <div>
+                                <div className="text-xs text-gray-400">Class</div>
+                                <div>{getClassName(player.classId, tournament.classes)}</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const PlayersPage: React.FC<{isPublic?: boolean}> = ({ isPublic = false }) => {
     const { tournamentId: idFromParams, slug } = useParams<{ tournamentId: string, slug: string }>();
@@ -202,8 +327,32 @@ const PlayersPage: React.FC<{isPublic?: boolean}> = ({ isPublic = false }) => {
                     </div>
                 </div>
 
-                {/* Players Table */}
-                <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+                {/* Mobile Cards */}
+                <div className="md:hidden">
+                    {filteredAndSortedPlayers.map((player) => (
+                        <MobilePlayerCard
+                            key={player.id}
+                            player={player}
+                            tournament={tournament}
+                            teams={teams}
+                            getClassName={getClassName}
+                            getTeamName={getTeamName}
+                            isPublic={isPublic}
+                            slug={slug}
+                            tournamentId={tournamentId}
+                        />
+                    ))}
+                    {filteredAndSortedPlayers.length === 0 && (
+                        <div className="p-8 text-center text-gray-400 bg-slate-800 rounded-xl border border-slate-700">
+                            {searchTerm 
+                                ? `No players found matching "${searchTerm}"` 
+                                : 'No players have been added to this tournament yet.'}
+                        </div>
+                    )}
+                </div>
+
+                {/* Desktop Table */}
+                <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead className="bg-slate-900/50 text-xs text-gray-300 uppercase tracking-wider sticky top-0">

@@ -21,7 +21,8 @@ const PairingsSkeleton: React.FC = () => (
             <SkeletonLoader className="h-10 w-24" />
         </div>
         
-        <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+        {/* Desktop Skeleton */}
+        <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                     <thead className="bg-slate-900/50 text-xs text-gray-300 uppercase tracking-wider">
@@ -47,8 +48,96 @@ const PairingsSkeleton: React.FC = () => (
                 </table>
             </div>
         </div>
+        
+        {/* Mobile Skeleton */}
+        <div className="md:hidden space-y-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-slate-800 rounded-xl shadow-lg border border-slate-700 p-4">
+                    <div className="flex justify-between items-center mb-3">
+                        <SkeletonLoader className="h-4 w-16" />
+                        <SkeletonLoader className="h-6 w-16 rounded-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <SkeletonLoader className="h-4 w-24" />
+                            <SkeletonLoader className="h-4 w-16" />
+                        </div>
+                        <div className="flex justify-between">
+                            <SkeletonLoader className="h-4 w-24" />
+                            <SkeletonLoader className="h-4 w-16" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
 );
+
+interface MobilePairingCardProps {
+    match: Match;
+    index: number;
+    tournament?: Tournament | null;
+    teamMap: Map<number, string>;
+}
+
+const MobilePairingCard: React.FC<MobilePairingCardProps> = ({ match, index, tournament, teamMap }) => {
+    const playerA = match.playerA;
+    const playerB = match.playerB;
+    const isCompleted = match.status === 'completed';
+
+    return (
+        <div className="md:hidden bg-slate-800 rounded-xl shadow-lg border border-slate-700 mb-4">
+            <div className="p-4">
+                <div className="flex justify-between items-center mb-3">
+                    <div className="font-mono text-cool-blue-400">Board {index + 1}</div>
+                    {isCompleted ? (
+                        <span className="px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs font-medium">
+                            {match.scoreA} - {match.scoreB}
+                        </span>
+                    ) : (
+                        <span className="px-3 py-1 bg-slate-700 text-gray-400 rounded-full text-xs font-medium">
+                            Pending
+                        </span>
+                    )}
+                </div>
+                
+                <div className="space-y-3">
+                    {/* Player A */}
+                    <div className="flex justify-between items-center pb-2 border-b border-slate-700">
+                        <div>
+                            <div className="font-medium">{playerA.name}</div>
+                            {tournament?.teamSettings.displayTeamNames && playerA.teamId && teamMap.get(playerA.teamId) && (
+                                <div className="text-xs text-gray-400">{teamMap.get(playerA.teamId)}</div>
+                            )}
+                        </div>
+                        {match.firstTurnPlayerId === playerA.id && (
+                            <span className="text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded">First Turn</span>
+                        )}
+                    </div>
+                    
+                    {/* Player B */}
+                    <div className="flex justify-between items-center pt-2">
+                        <div>
+                            {playerB ? (
+                                <>
+                                    <div className="font-medium">{playerB.name}</div>
+                                    {tournament?.teamSettings.displayTeamNames && playerB.teamId && teamMap.get(playerB.teamId) && (
+                                        <div className="text-xs text-gray-400">{teamMap.get(playerB.teamId)}</div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="text-gray-500">BYE</div>
+                            )}
+                        </div>
+                        {playerB && match.firstTurnPlayerId === playerB.id && (
+                            <span className="text-xs bg-amber-900/50 text-amber-300 px-2 py-1 rounded">First Turn</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const PairingsPage: React.FC<{isPublic?: boolean}> = ({ isPublic = false }) => {
     const { tournamentId: idFromParams, slug } = useParams<{ tournamentId: string; slug: string }>();
@@ -242,8 +331,28 @@ const PairingsPage: React.FC<{isPublic?: boolean}> = ({ isPublic = false }) => {
                     </div>
                 </div>
 
-                {/* Pairings Table */}
-                <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
+                {/* Mobile Cards */}
+                <div className="md:hidden">
+                    {matchesForSelectedRoundAndDivision.map((match, index) => (
+                        <MobilePairingCard 
+                            key={match.id}
+                            match={match}
+                            index={index}
+                            tournament={tournament}
+                            teamMap={teamMap}
+                        />
+                    ))}
+                    {matchesForSelectedRoundAndDivision.length === 0 && (
+                        <div className="p-8 text-center text-gray-400 bg-slate-800 rounded-xl border border-slate-700">
+                            {searchTerm 
+                                ? `No matches found for "${searchTerm}" in Round ${selectedRound}` 
+                                : `No pairings available for Round ${selectedRound}`}
+                        </div>
+                    )}
+                </div>
+
+                {/* Desktop Table */}
+                <div className="hidden md:block bg-slate-800 rounded-xl shadow-lg overflow-hidden border border-slate-700">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead className="bg-slate-900/50 text-xs text-gray-300 uppercase tracking-wider sticky top-0">
