@@ -6,11 +6,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
-[functions]
-  node_version = "18"
-
-[dev]
-  command = "npm run dev"
-  port = 3000
-  targetPort = 3000
