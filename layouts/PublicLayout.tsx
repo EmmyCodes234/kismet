@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
-import PublicHeader from '../components/PublicHeader';
 import { Tournament } from '../types';
 import * as api from '../services/apiService';
 
@@ -35,7 +34,11 @@ const PublicLayout: React.FC = () => {
     if (loading) {
         return (
             <div className="flex flex-col min-h-screen bg-slate-900 text-gray-100">
-                <PublicHeader tournament={null} />
+                <div className="bg-slate-800 border-b border-slate-700">
+                    <div className="max-w-7xl mx-auto px-4 py-4">
+                        <div className="h-8 bg-slate-700 rounded animate-pulse w-64"></div>
+                    </div>
+                </div>
                 <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
                     <p>Loading Tournament...</p>
                 </main>
@@ -44,9 +47,13 @@ const PublicLayout: React.FC = () => {
     }
     
     if (error || !tournament) {
-         return (
+        return (
             <div className="flex flex-col min-h-screen bg-slate-900 text-gray-100">
-                <PublicHeader tournament={null} />
+                <div className="bg-slate-800 border-b border-slate-700">
+                    <div className="max-w-7xl mx-auto px-4 py-4">
+                        <div className="h-8 bg-slate-700 rounded w-64"></div>
+                    </div>
+                </div>
                 <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
                     <p className="text-red-400">{error || 'Could not load tournament.'}</p>
                 </main>
@@ -54,11 +61,9 @@ const PublicLayout: React.FC = () => {
         );
     }
 
-
     return (
         <div className="flex flex-col min-h-screen bg-slate-900 text-gray-100">
-            <PublicHeader tournament={tournament} />
-            <main className="flex-1 p-4 md:p-8">
+            <main className="flex-1">
                 <Outlet context={{ tournament }} />
             </main>
         </div>

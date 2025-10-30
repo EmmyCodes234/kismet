@@ -1,0 +1,119 @@
+/* Clean UI Styles for Kismet Public Pages */
+
+/* Responsive table improvements */
+@media screen and (max-width: 768px) {
+  .responsive-table thead {
+    display: none;
+  }
+  
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgb(51 65 85); /* slate-700 */
+    background-color: rgb(30 41 59); /* slate-800 */
+  }
+  
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    text-align: right;
+    border-bottom: 1px solid rgb(51 65 85); /* slate-700 */
+  }
+  
+  .responsive-table td:last-child {
+    border-bottom: none;
+  }
+  
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: rgb(148 163 184); /* slate-400 */
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-align: left;
+    margin-right: 1rem;
+  }
+}
+
+/* Print-specific styles */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  main {
+    padding: 0 !important;
+  }
+  
+  .printable-area {
+    box-shadow: none !important;
+    border: 1px solid #ccc;
+  }
+  
+  .printable-area, .printable-area * {
+    background-color: white !important;
+    color: black !important;
+    border-color: #ccc !important;
+  }
+  
+  .printable-area a {
+    text-decoration: none;
+  }
+  
+  .printable-area .text-cool-blue-400 {
+    color: #38bdf8 !important;
+  }
+  
+  .printable-area .text-green-300 {
+    color: #34d399 !important;
+  }
+  
+  .printable-area .text-red-400 {
+    color: #f87171 !important;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(15 23 42); /* slate-900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(51 65 85); /* slate-700 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139); /* slate-500 */
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid rgb(56 189 248); /* cool-blue-400 */
+  outline-offset: 2px;
+}
